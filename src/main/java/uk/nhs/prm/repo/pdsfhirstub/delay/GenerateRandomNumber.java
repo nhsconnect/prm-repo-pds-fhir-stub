@@ -8,7 +8,7 @@ import java.util.Random;
 @Slf4j
 @Component
 public class GenerateRandomNumber {
-    protected double generate(){
+    public double generate(){
         final Random r = new Random();
         log.info(String.valueOf(r.nextFloat()*100));
         return r.nextFloat()*100;

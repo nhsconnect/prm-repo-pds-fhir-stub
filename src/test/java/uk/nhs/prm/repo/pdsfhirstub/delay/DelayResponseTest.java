@@ -1,5 +1,7 @@
 package uk.nhs.prm.repo.pdsfhirstub.delay;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,51 +23,56 @@ public class DelayResponseTest {
     @InjectMocks
     private DelayResponse delayResponse;
 
-    @Test
-    void shouldReturn4477msDelayWhenRandomNumberOver99_99() throws InterruptedException {
-        when(generateRandomNumber.generate()).thenReturn(99.9987284);
+    @Nested
+    @DisplayName("GET Response Delay")
+    class PdsRetrievalResponseDelayTest {
 
-        assertThat(delayResponse.getRetrievalResponseTime()).isEqualTo(4477);
-        verify(sleeper).sleep(4477);
-    }
+        @Test
+        void shouldReturn4477msDelayWhenRandomNumberOver99_99() throws InterruptedException {
+            when(generateRandomNumber.generate()).thenReturn(99.9987284);
 
-    @Test
-    void shouldReturn442msDelayWhenRandomNumberOver99() throws InterruptedException {
-        when(generateRandomNumber.generate()).thenReturn(99.8126778);
+            assertThat(delayResponse.getRetrievalResponseTime()).isEqualTo(4477);
+            verify(sleeper).sleep(4477);
+        }
 
-        assertThat(delayResponse.getRetrievalResponseTime()).isEqualTo(442);
-        verify(sleeper).sleep(442);
-    }
+        @Test
+        void shouldReturn442msDelayWhenRandomNumberOver99() throws InterruptedException {
+            when(generateRandomNumber.generate()).thenReturn(99.8126778);
 
-    @Test
-    void shouldReturn184msDelayWhenRandomNumberOver95() throws InterruptedException {
-        when(generateRandomNumber.generate()).thenReturn(96.1);
+            assertThat(delayResponse.getRetrievalResponseTime()).isEqualTo(442);
+            verify(sleeper).sleep(442);
+        }
 
-        assertThat(delayResponse.getRetrievalResponseTime()).isEqualTo(184);
-        verify(sleeper).sleep(184);
-    }
+        @Test
+        void shouldReturn184msDelayWhenRandomNumberOver95() throws InterruptedException {
+            when(generateRandomNumber.generate()).thenReturn(96.1);
 
-    @Test
-    void shouldReturn81msDelayWhenRandomNumberOver85() throws InterruptedException {
-        when(generateRandomNumber.generate()).thenReturn(85.1);
+            assertThat(delayResponse.getRetrievalResponseTime()).isEqualTo(184);
+            verify(sleeper).sleep(184);
+        }
 
-        assertThat(delayResponse.getRetrievalResponseTime()).isEqualTo(81);
-        verify(sleeper).sleep(81);
-    }
+        @Test
+        void shouldReturn81msDelayWhenRandomNumberOver85() throws InterruptedException {
+            when(generateRandomNumber.generate()).thenReturn(85.1);
 
-    @Test
-    void shouldReturn59msDelayWhenRandomNumberOver50() throws InterruptedException {
-        when(generateRandomNumber.generate()).thenReturn(50.1);
+            assertThat(delayResponse.getRetrievalResponseTime()).isEqualTo(81);
+            verify(sleeper).sleep(81);
+        }
 
-        assertThat(delayResponse.getRetrievalResponseTime()).isEqualTo(59);
-        verify(sleeper).sleep(59);
-    }
+        @Test
+        void shouldReturn59msDelayWhenRandomNumberOver50() throws InterruptedException {
+            when(generateRandomNumber.generate()).thenReturn(50.1);
 
-    @Test
-    void shouldReturn46msDelayWhenRandomNumberUnder50() throws InterruptedException {
-        when(generateRandomNumber.generate()).thenReturn(49.9);
+            assertThat(delayResponse.getRetrievalResponseTime()).isEqualTo(59);
+            verify(sleeper).sleep(59);
+        }
 
-        assertThat(delayResponse.getRetrievalResponseTime()).isEqualTo(46);
-        verify(sleeper).sleep(46);
+        @Test
+        void shouldReturn46msDelayWhenRandomNumberUnder50() throws InterruptedException {
+            when(generateRandomNumber.generate()).thenReturn(49.9);
+
+            assertThat(delayResponse.getRetrievalResponseTime()).isEqualTo(46);
+            verify(sleeper).sleep(46);
+        }
     }
 }

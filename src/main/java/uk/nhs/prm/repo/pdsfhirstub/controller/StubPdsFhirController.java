@@ -22,7 +22,7 @@ public class StubPdsFhirController {
         log.info("Received PDS Retrieval request");
         var retrievalResponseTime = delayResponse.getRetrievalResponseTime();
 
-        log.info("Delayed by: " + retrievalResponseTime);
+        log.info("Delayed by " + retrievalResponseTime + "ms");
         return retrievalResponse.getResponse(nhsNumber);
     }
 
@@ -32,7 +32,7 @@ public class StubPdsFhirController {
         log.info("Received PDS Update request");
         var updateResponseTime = delayResponse.getUpdateResponseTime();
 
-        log.info("Delayed by: " + updateResponseTime);
+        log.info("Delayed by " + updateResponseTime + "ms");
         return updateResponse.getResponse(nhsNumber);
     }
 }

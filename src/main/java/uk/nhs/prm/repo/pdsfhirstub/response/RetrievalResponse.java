@@ -1,8 +1,15 @@
 package uk.nhs.prm.repo.pdsfhirstub.response;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class RetrievalResponse {
 
     public String getResponse(String nhsNumber) {
+        return template().replaceAll("NHS_NUMBER", nhsNumber);
+    }
+
+    private String template() {
         return "{\n" +
                 "    \"address\": [\n" +
                 "        {\n" +
@@ -87,6 +94,6 @@ public class RetrievalResponse {
                 "        }\n" +
                 "    ],\n" +
                 "    \"resourceType\": \"Patient\"\n" +
-                "}".replaceAll("NHS_NUMBER", nhsNumber);
+                "}";
     }
 }
