@@ -11,7 +11,7 @@ public class DelayResponse {
     private Sleeper sleeper;
     private GenerateRandomNumber generateRandomNumber;
 
-    public int getResponseTime() throws InterruptedException {
+    public int getRetrievalResponseTime() throws InterruptedException {
         double randomNumber = generateRandomNumber.generate();
         if (randomNumber < 50) {
             sleeper.sleep(46);
@@ -35,5 +35,9 @@ public class DelayResponse {
         }
         sleeper.sleep(4477);
         return 4477;
+    }
+
+    public int getUpdateResponseTime() {
+        return 0;
     }
 }

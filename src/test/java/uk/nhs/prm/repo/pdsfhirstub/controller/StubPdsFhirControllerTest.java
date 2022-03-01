@@ -10,10 +10,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.nhs.prm.repo.pdsfhirstub.delay.DelayResponse;
 import uk.nhs.prm.repo.pdsfhirstub.response.RetrievalResponse;
+import uk.nhs.prm.repo.pdsfhirstub.response.UpdateResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,15 +31,29 @@ public class StubPdsFhirControllerTest {
     private RetrievalResponse retrievalResponse;
 
     @MockBean
+    private UpdateResponse updateResponse;
+
+    @MockBean
     private DelayResponse delayResponse;
 
     @Test
-    void shouldCallPdsServiceWithNhsNumberOnDemographicsRequest() throws Exception {
-        when(delayResponse.getResponseTime()).thenReturn(0);
-        when(retrievalResponse.getResponse(NHS_NUMBER)).thenReturn("response");
+    void shouldDelayResponseAndReturnPdsRetrievalResponse() throws Exception {
+        when(delayResponse.getRetrievalResponseTime()).thenReturn(0);
+        when(retrievalResponse.getResponse(NHS_NUMBER)).thenReturn("retrieval-response");
 
         var contentAsString = mockMvc.perform(get("/Patient/" + NHS_NUMBER))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        assertThat(contentAsString).isEqualTo("response");
+        verify(delayResponse).getRetrievalResponseTime();
+        assertThat(contentAsString).isEqualTo("retrieval-response");
+    }
+
+    @Test
+    void shouldDelayResponseAndReturnPdsUpdateResponse() throws Exception {
+        when(delayResponse.getUpdateResponseTime()).thenReturn(0);
+        when(updateResponse.getResponse(NHS_NUMBER)).thenReturn("update-response");
+
+        var contentAsString = mockMvc.perform(patch("/Patient/" + NHS_NUMBER))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertThat(contentAsString).isEqualTo("update-response");
     }
 }
