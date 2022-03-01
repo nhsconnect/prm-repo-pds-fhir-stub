@@ -1,28 +1,32 @@
 package uk.nhs.prm.repo.pdsfhirstub.delay;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Random;
-
 @Slf4j
+@AllArgsConstructor
 @Component
 public class DelayResponse {
+    private GenerateRandomNumber generateRandomNumber;
+
     public int getResponseTime() {
-        double randomNumber = generateRandomNumber();
-
-        if (randomNumber > 50) {
-            log.info("5000 DELAY");
-            return 5000;
-        } else {
-            log.info("2000 DELAY");
-            return 2000;
+        double randomNumber = generateRandomNumber.generate();
+        if (randomNumber < 50) {
+            return 46;
         }
-    }
-
-    protected double generateRandomNumber(){
-        final Random r = new Random();
-        log.info(String.valueOf(r.nextFloat()*100));
-        return r.nextFloat()*100;
+        if (randomNumber < 85) {
+            return 59;
+        }
+        if (randomNumber < 95) {
+            return 81;
+        }
+        if (randomNumber < 99) {
+            return 184;
+        }
+        if (randomNumber < 99.9) {
+            return 442;
+        }
+        return 4477;
     }
 }
