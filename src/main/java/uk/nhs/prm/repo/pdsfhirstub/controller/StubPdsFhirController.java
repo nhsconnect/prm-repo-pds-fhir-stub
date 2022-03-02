@@ -21,23 +21,26 @@ public class StubPdsFhirController {
     @GetMapping("Patient/{nhsNumber}")
     public ResponseEntity<String> getPatientGpStatus(@PathVariable("nhsNumber") String nhsNumber) throws InterruptedException {
         log.info("Received PDS Retrieval request");
-        var retrievalResponseTime = delayResponse.getRetrievalResponseTime();
+        var requestDelay = delayResponse.getRetrievalResponseTime();
 
-        log.info("Delayed by " + retrievalResponseTime + "ms");
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("ETag", "W/1");
-        return new ResponseEntity<>(
-                retrievalResponse.getResponse(nhsNumber), headers, HttpStatus.OK);
+        log.info("Retrieval Request processed with delay " + requestDelay + "ms");
+
+        return generateResponse(retrievalResponse.getResponse(nhsNumber));
     }
 
     @PatchMapping("Patient/{nhsNumber}")
-    @ResponseStatus(HttpStatus.OK)
-    public String updatePatientGpStatus(@PathVariable("nhsNumber") String nhsNumber) {
+    public ResponseEntity<String> updatePatientGpStatus(@PathVariable("nhsNumber") String nhsNumber) throws InterruptedException {
         log.info("Received PDS Update request");
-        var updateResponseTime = delayResponse.getUpdateResponseTime();
+        var requestDelay = delayResponse.getUpdateResponseTime();
 
-        log.info("Delayed by " + updateResponseTime + "ms");
-        return updateResponse.getResponse(nhsNumber);
+        log.info("Update Request processed with delay " + requestDelay + "ms");
+        return generateResponse(updateResponse.getResponse(nhsNumber));
+    }
+
+    private ResponseEntity<String> generateResponse(String body) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setETag("W/\"1\"");
+        return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
 }
 

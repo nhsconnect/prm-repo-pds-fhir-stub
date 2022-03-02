@@ -7,7 +7,7 @@ import java.util.Random;
 
 @Slf4j
 @Component
-public class GenerateRandomNumber {
+public class RandomNumberGenerator {
     public double generate(){
         final Random r = new Random();
         return r.nextFloat() * 100;

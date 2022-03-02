@@ -46,7 +46,7 @@ public class StubPdsFhirControllerTest {
 
         verify(delayResponse).getRetrievalResponseTime();
         assertThat(response.getContentAsString()).isEqualTo("retrieval-response");
-        assertThat(response.getHeaderValue("ETag")).isNotNull();
+        assertThat(response.getHeaderValue("ETag")).isEqualTo("W/\"1\"");
     }
 
     @Test
@@ -54,8 +54,12 @@ public class StubPdsFhirControllerTest {
         when(delayResponse.getUpdateResponseTime()).thenReturn(0);
         when(updateResponse.getResponse(NHS_NUMBER)).thenReturn("update-response");
 
-        var contentAsString = mockMvc.perform(patch("/Patient/" + NHS_NUMBER))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        assertThat(contentAsString).isEqualTo("update-response");
+        var response = mockMvc.perform(patch("/Patient/" + NHS_NUMBER))
+                .andExpect(status().isOk()).andReturn().getResponse();
+
+        verify(delayResponse).getUpdateResponseTime();
+
+        assertThat(response.getContentAsString()).isEqualTo("update-response");
+        assertThat(response.getHeaderValue("ETag")).isEqualTo("W/\"1\"");
     }
 }
