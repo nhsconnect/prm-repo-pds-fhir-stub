@@ -41,10 +41,12 @@ public class StubPdsFhirControllerTest {
         when(delayResponse.getRetrievalResponseTime()).thenReturn(0);
         when(retrievalResponse.getResponse(NHS_NUMBER)).thenReturn("retrieval-response");
 
-        var contentAsString = mockMvc.perform(get("/Patient/" + NHS_NUMBER))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        var response = mockMvc.perform(get("/Patient/" + NHS_NUMBER))
+                .andExpect(status().isOk()).andReturn().getResponse();
+
         verify(delayResponse).getRetrievalResponseTime();
-        assertThat(contentAsString).isEqualTo("retrieval-response");
+        assertThat(response.getContentAsString()).isEqualTo("retrieval-response");
+        assertThat(response.getHeaderValue("ETag")).isNotNull();
     }
 
     @Test
