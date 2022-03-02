@@ -10,7 +10,6 @@ import java.util.Random;
 public class GenerateRandomNumber {
     public double generate(){
         final Random r = new Random();
-        log.info(String.valueOf(r.nextFloat()*100));
-        return r.nextFloat()*100;
+        return r.nextFloat() * 100;
     }
 }
