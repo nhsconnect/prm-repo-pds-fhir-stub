@@ -126,6 +126,34 @@ function build_docker_image() {
   echo Build completed on `date`
 }
 
+function promote_docker_image_from_ci_to_perf {
+  # e.g. deductions/ehr-repo:1ab321
+  SRC_IMAGE_NAME_AND_TAG=$1
+  if [ -z "$SRC_IMAGE_NAME_AND_TAG" ]; then
+    >&2 echo "Image name and tag must be specified. e.g. deductions/ehr-repo:1ab321"
+    exit $EXIT_CODE_GENERAL_FAILURE;
+  fi
+
+  environment_from="ci"
+  environment_to="perf"
+
+  echo >&2 "Promoting docker image from $environment_from to $environment_to..."
+
+  assume_environment_role "$environment_from"
+  configure_docker_registry_uri
+  IMAGE_FULL_URL="$REGISTRY_URI/$SRC_IMAGE_NAME_AND_TAG"
+  echo "Pulling the image from $IMAGE_FULL_URL"
+  docker pull "$IMAGE_FULL_URL"
+  docker tag "$IMAGE_FULL_URL" "$SRC_IMAGE_NAME_AND_TAG"
+
+  assume_environment_role "$environment_to"
+  configure_docker_registry_uri
+  IMAGE_FULL_URL="$REGISTRY_URI/$SRC_IMAGE_NAME_AND_TAG"
+  docker tag "$SRC_IMAGE_NAME_AND_TAG" "$IMAGE_FULL_URL"
+  echo "Pushing the image to $IMAGE_FULL_URL"
+  docker push "$IMAGE_FULL_URL"
+}
+
 ###########
 ## TASKS ##
 ###########
@@ -192,7 +220,7 @@ case "${command}" in
   promote_docker_image)
       check_env
       set_image_tag
-      promote_docker_image "$IMAGE_REPO_NAME:$IMAGE_TAG" "$NHS_ENVIRONMENT"
+      promote_docker_image_from_ci_to_perf "$IMAGE_REPO_NAME:$IMAGE_TAG"
       ;;
   _wait_ecs)
       _assume_environment_role $NHS_ENVIRONMENT
