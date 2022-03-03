@@ -1,6 +1,6 @@
 format_version: 4
 pipelines:
-  'prm-deductions-pds-adaptor':
+  'prm-repo-pds-fhir-stub':
     group: continuity-service
     label_template: '${git[:8]}'
     materials:
