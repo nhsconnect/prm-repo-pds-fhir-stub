@@ -136,7 +136,6 @@ case "${command}" in
       fetch_redaction_utils
       ;;
   build_docker)
-      configure_local_envs
       dojo -c Dojofile-itest "./tasks _build"
       configure_docker_repository_uri
       fetch_redaction_utils
@@ -155,7 +154,6 @@ case "${command}" in
       gradle test
       ;;
   test_unit)
-      configure_local_envs
       dojo "./tasks _test_unit"
       ;;
   run_local)
