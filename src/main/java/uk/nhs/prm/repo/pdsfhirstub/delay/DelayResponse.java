@@ -39,9 +39,9 @@ public class DelayResponse {
         return setDelay("100", randomNumber, maxDelay);
     }
 
-    private int setDelay(String percentile, double randomNumber, int p50Delay) throws InterruptedException {
-        log.info("Generated random variable {} is in the {} percentile", percentile, randomNumber);
-        sleeper.sleep(p50Delay);
-        return p50Delay;
+    private int setDelay(String percentile, double randomNumber, int delay) throws InterruptedException {
+        log.info("Generated random variable {} is in the {} percentile", randomNumber, percentile);
+        sleeper.sleep(delay);
+        return delay;
     }
 }
