@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.nhs.prm.repo.pdsfhirstub.config.Tracer;
 import uk.nhs.prm.repo.pdsfhirstub.delay.DelayResponse;
 import uk.nhs.prm.repo.pdsfhirstub.response.RetrievalResponse;
 import uk.nhs.prm.repo.pdsfhirstub.response.UpdateResponse;
@@ -36,15 +37,20 @@ public class StubPdsFhirControllerTest {
     @MockBean
     private DelayResponse delayResponse;
 
+    @MockBean
+    private Tracer tracer;
+
     @Test
     void shouldDelayResponseAndReturnPdsRetrievalResponse() throws Exception {
         when(delayResponse.getRetrievalResponseTime()).thenReturn(0);
         when(retrievalResponse.getResponse(NHS_NUMBER)).thenReturn("retrieval-response");
 
-        var response = mockMvc.perform(get("/Patient/" + NHS_NUMBER))
+        var response = mockMvc.perform(
+                get("/Patient/" + NHS_NUMBER).header("traceId", "The-Trace-Id"))
                 .andExpect(status().isOk()).andReturn().getResponse();
 
         verify(delayResponse).getRetrievalResponseTime();
+        verify(tracer).setTraceId("The-Trace-Id");
         assertThat(response.getContentAsString()).isEqualTo("retrieval-response");
         assertThat(response.getHeaderValue("ETag")).isEqualTo("W/\"1\"");
     }
@@ -54,11 +60,12 @@ public class StubPdsFhirControllerTest {
         when(delayResponse.getUpdateResponseTime()).thenReturn(0);
         when(updateResponse.getResponse(NHS_NUMBER)).thenReturn("update-response");
 
-        var response = mockMvc.perform(patch("/Patient/" + NHS_NUMBER))
+        var response = mockMvc.perform(
+                patch("/Patient/" + NHS_NUMBER).header("traceId", "The-Trace-Id"))
                 .andExpect(status().isOk()).andReturn().getResponse();
 
         verify(delayResponse).getUpdateResponseTime();
-
+        verify(tracer).setTraceId("The-Trace-Id");
         assertThat(response.getContentAsString()).isEqualTo("update-response");
         assertThat(response.getHeaderValue("ETag")).isEqualTo("W/\"1\"");
     }
