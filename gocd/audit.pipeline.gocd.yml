@@ -1,6 +1,6 @@
 format_version: 4
 pipelines:
-  'prm-deductions-pds-adaptor.audit':
+  'prm-repo-fhir-stub.audit':
     group: deductions-audit
     label_template: '${git[:8]}'
     materials:
