@@ -1,11 +1,14 @@
 package uk.nhs.prm.repo.pdsfhirstub.response;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class UpdateResponse {
 
     public String getResponse(String nhsNumber, int delay) {
+        log.info("gere us tge " + delay);
         if (delay > 10000) {
             return serviceUnavailableResponse();
         }

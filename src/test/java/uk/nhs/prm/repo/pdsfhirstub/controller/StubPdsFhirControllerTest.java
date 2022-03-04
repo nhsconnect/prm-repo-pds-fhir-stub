@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.nhs.prm.repo.pdsfhirstub.config.Tracer;
 import uk.nhs.prm.repo.pdsfhirstub.delay.DelayResponse;
 import uk.nhs.prm.repo.pdsfhirstub.response.RetrievalResponse;
 import uk.nhs.prm.repo.pdsfhirstub.response.UpdateResponse;
@@ -37,50 +36,49 @@ public class StubPdsFhirControllerTest {
     @MockBean
     private DelayResponse delayResponse;
 
-    @MockBean
-    private Tracer tracer;
-
     @Test
     void shouldDelayResponseAndReturnPdsRetrievalResponse() throws Exception {
         when(delayResponse.getRetrievalResponseTime()).thenReturn(0);
         when(retrievalResponse.getResponse(NHS_NUMBER)).thenReturn("retrieval-response");
 
         var response = mockMvc.perform(
-                get("/Patient/" + NHS_NUMBER).header("traceId", "The-Trace-Id"))
+                get("/Patient/" + NHS_NUMBER))
                 .andExpect(status().isOk()).andReturn().getResponse();
 
         verify(delayResponse).getRetrievalResponseTime();
-        verify(tracer).setTraceId("The-Trace-Id");
+        verify(retrievalResponse).getResponse(NHS_NUMBER);
         assertThat(response.getContentAsString()).isEqualTo("retrieval-response");
         assertThat(response.getHeaderValue("ETag")).isEqualTo("W/\"1\"");
     }
 
     @Test
     void shouldDelayResponseAndReturnPdsUpdateResponse() throws Exception {
-        when(delayResponse.getUpdateResponseTime()).thenReturn(0);
-        when(updateResponse.getResponse(NHS_NUMBER, 10001)).thenReturn("update-response");
+        var delay = 0;
+        when(delayResponse.getUpdateResponseTime()).thenReturn(delay);
+        when(updateResponse.getResponse(NHS_NUMBER, delay)).thenReturn("update-response");
 
         var response = mockMvc.perform(
-                patch("/Patient/" + NHS_NUMBER).header("traceId", "The-Trace-Id"))
+                patch("/Patient/" + NHS_NUMBER))
                 .andExpect(status().isOk()).andReturn().getResponse();
 
         verify(delayResponse).getUpdateResponseTime();
-        verify(tracer).setTraceId("The-Trace-Id");
+        verify(updateResponse).getResponse(NHS_NUMBER, delay);
         assertThat(response.getContentAsString()).isEqualTo("update-response");
         assertThat(response.getHeaderValue("ETag")).isEqualTo("W/\"1\"");
     }
 
     @Test
     void shouldReturn503ResponseIfDelayIsOver10Seconds() throws Exception {
-        when(delayResponse.getUpdateResponseTime()).thenReturn(10001);
-        when(updateResponse.getResponse(NHS_NUMBER, 10001)).thenReturn("update-response");
+        var delay = 10001;
+        when(delayResponse.getUpdateResponseTime()).thenReturn(delay);
+        when(updateResponse.getResponse(NHS_NUMBER, delay)).thenReturn("update-response");
 
         var response = mockMvc.perform(
-                        patch("/Patient/" + NHS_NUMBER).header("traceId", "The-Trace-Id"))
+                        patch("/Patient/" + NHS_NUMBER))
                 .andExpect(status().isServiceUnavailable()).andReturn().getResponse();
 
         verify(delayResponse).getUpdateResponseTime();
-        verify(tracer).setTraceId("The-Trace-Id");
+        verify(updateResponse).getResponse(NHS_NUMBER, delay);
         assertThat(response.getContentAsString()).isEqualTo("update-response");
         assertThat(response.getHeaderValue("ETag")).isEqualTo("W/\"1\"");
     }

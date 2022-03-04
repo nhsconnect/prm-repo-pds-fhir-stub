@@ -6,7 +6,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.nhs.prm.repo.pdsfhirstub.config.Tracer;
 import uk.nhs.prm.repo.pdsfhirstub.delay.DelayResponse;
 import uk.nhs.prm.repo.pdsfhirstub.response.RetrievalResponse;
 import uk.nhs.prm.repo.pdsfhirstub.response.UpdateResponse;
@@ -18,11 +17,9 @@ public class StubPdsFhirController {
     private DelayResponse delayResponse;
     private RetrievalResponse retrievalResponse;
     private UpdateResponse updateResponse;
-    private Tracer tracer;
 
     @GetMapping("Patient/{nhsNumber}")
-    public ResponseEntity<String> getPatientGpStatus(@PathVariable("nhsNumber") String nhsNumber, @RequestHeader(value = "traceId", required = false) String traceId) throws InterruptedException {
-        tracer.setTraceId(traceId);
+    public ResponseEntity<String> getPatientGpStatus(@PathVariable("nhsNumber") String nhsNumber) throws InterruptedException {
         log.info("Received PDS Retrieval request");
         var requestDelay = delayResponse.getRetrievalResponseTime();
 
@@ -32,13 +29,12 @@ public class StubPdsFhirController {
     }
 
     @PatchMapping("Patient/{nhsNumber}")
-    public ResponseEntity<String> updatePatientGpStatus(@PathVariable("nhsNumber") String nhsNumber, @RequestHeader(value = "traceId", required = false) String traceId) throws InterruptedException {
-        tracer.setTraceId(traceId);
+    public ResponseEntity<String> updatePatientGpStatus(@PathVariable("nhsNumber") String nhsNumber) throws InterruptedException {
         log.info("Received PDS Update request");
         var requestDelay = delayResponse.getUpdateResponseTime();
 
         log.info("Update Request processed with delay " + requestDelay + "ms");
-        return generateResponse(updateResponse.getResponse(nhsNumber, 10001), getUpdateStatus(requestDelay));
+        return generateResponse(updateResponse.getResponse(nhsNumber, requestDelay), getUpdateStatus(requestDelay));
     }
 
     private ResponseEntity<String> generateResponse(String body, HttpStatus status) {
