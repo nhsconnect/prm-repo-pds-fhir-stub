@@ -96,17 +96,4 @@ public class RetrievalResponse {
                 "    \"resourceType\": \"Patient\"\n" +
                 "}";
     }
-
-    private String mofField() {
-        return  "    \"managingOrganization\": {\n" +
-                "        \"identifier\": {\n" +
-                "            \"period\": {\n" +
-                "                \"start\": \"2021-12-03\"\n" +
-                "            },\n" +
-                "            \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\n" +
-                "            \"value\": \"UPDATED_MOF\"\n" +
-                "        },\n" +
-                "        \"type\": \"Organization\"\n" +
-                "    },\n";
-    }
 }

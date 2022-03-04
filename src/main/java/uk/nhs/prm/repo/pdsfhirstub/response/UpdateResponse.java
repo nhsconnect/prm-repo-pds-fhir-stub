@@ -5,11 +5,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class UpdateResponse {
 
-    public String getResponse(String nhsNumber) {
-        return template().replaceAll("NHS_NUMBER", nhsNumber);
+    public String getResponse(String nhsNumber, int delay) {
+        if (delay > 10000) {
+            return serviceUnavailableResponse();
+        }
+        return mofUpdatedResponse().replaceAll("NHS_NUMBER", nhsNumber);
     }
 
-    private String template() {
+    private String mofUpdatedResponse() {
         return "{\n" +
                 "    \"address\": [\n" +
                 "        {\n" +
@@ -106,4 +109,29 @@ public class UpdateResponse {
                 "    \"resourceType\": \"Patient\"\n" +
                 "}";
     }
+
+    public String serviceUnavailableResponse() {
+        return "{\n" +
+                "  \"resourceType\": \"OperationOutcome\",\n" +
+                "  \"issue\": [\n" +
+                "    {\n" +
+                "      \"severity\": \"error\",\n" +
+                "      \"code\": \"timeout\",\n" +
+                "      \"details\": {\n" +
+                "        \"coding\": [\n" +
+                "          {\n" +
+                "            \"system\": \"https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode\",\n" +
+                "            \"version\": \"1\",\n" +
+                "            \"code\": \"SERVICE_UNAVAILABLE\",\n" +
+                "            \"display\": \"Service unavailable\"\n" +
+                "          }\n" +
+                "        ]\n" +
+                "      },\n" +
+                "      \"diagnostics\": \"The downstream domain processing has not completed within the configured timeout period. Using the same 'X-Request-ID' header, retry your request after the time specified by the 'Retry-After' response header.\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+    }
+
+
 }

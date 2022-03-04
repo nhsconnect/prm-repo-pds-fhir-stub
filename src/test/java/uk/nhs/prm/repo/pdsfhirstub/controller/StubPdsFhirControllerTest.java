@@ -58,11 +58,26 @@ public class StubPdsFhirControllerTest {
     @Test
     void shouldDelayResponseAndReturnPdsUpdateResponse() throws Exception {
         when(delayResponse.getUpdateResponseTime()).thenReturn(0);
-        when(updateResponse.getResponse(NHS_NUMBER)).thenReturn("update-response");
+        when(updateResponse.getResponse(NHS_NUMBER, 10001)).thenReturn("update-response");
 
         var response = mockMvc.perform(
                 patch("/Patient/" + NHS_NUMBER).header("traceId", "The-Trace-Id"))
                 .andExpect(status().isOk()).andReturn().getResponse();
+
+        verify(delayResponse).getUpdateResponseTime();
+        verify(tracer).setTraceId("The-Trace-Id");
+        assertThat(response.getContentAsString()).isEqualTo("update-response");
+        assertThat(response.getHeaderValue("ETag")).isEqualTo("W/\"1\"");
+    }
+
+    @Test
+    void shouldReturn503ResponseIfDelayIsOver10Seconds() throws Exception {
+        when(delayResponse.getUpdateResponseTime()).thenReturn(10001);
+        when(updateResponse.getResponse(NHS_NUMBER, 10001)).thenReturn("update-response");
+
+        var response = mockMvc.perform(
+                        patch("/Patient/" + NHS_NUMBER).header("traceId", "The-Trace-Id"))
+                .andExpect(status().isServiceUnavailable()).andReturn().getResponse();
 
         verify(delayResponse).getUpdateResponseTime();
         verify(tracer).setTraceId("The-Trace-Id");

@@ -28,7 +28,7 @@ public class StubPdsFhirController {
 
         log.info("Retrieval Request processed with delay " + requestDelay + "ms");
 
-        return generateResponse(retrievalResponse.getResponse(nhsNumber));
+        return generateResponse(retrievalResponse.getResponse(nhsNumber), HttpStatus.OK);
     }
 
     @PatchMapping("Patient/{nhsNumber}")
@@ -38,13 +38,17 @@ public class StubPdsFhirController {
         var requestDelay = delayResponse.getUpdateResponseTime();
 
         log.info("Update Request processed with delay " + requestDelay + "ms");
-        return generateResponse(updateResponse.getResponse(nhsNumber));
+        return generateResponse(updateResponse.getResponse(nhsNumber, 10001), getUpdateStatus(requestDelay));
     }
 
-    private ResponseEntity<String> generateResponse(String body) {
+    private ResponseEntity<String> generateResponse(String body, HttpStatus status) {
         HttpHeaders headers = new HttpHeaders();
         headers.setETag("W/\"1\"");
-        return new ResponseEntity<>(body, headers, HttpStatus.OK);
+        return new ResponseEntity<>(body, headers, status);
     }
-}
 
+    private HttpStatus getUpdateStatus(int requestDelay) {
+        return requestDelay > 10000 ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.OK;
+    }
+
+}
