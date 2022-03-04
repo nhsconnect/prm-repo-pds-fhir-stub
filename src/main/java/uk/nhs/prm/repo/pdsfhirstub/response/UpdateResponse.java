@@ -2,17 +2,19 @@ package uk.nhs.prm.repo.pdsfhirstub.response;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uk.nhs.prm.repo.pdsfhirstub.pdspatchrequest.PdsPatchRequest;
 
 @Component
 @Slf4j
 public class UpdateResponse {
 
-    public String getResponse(String nhsNumber, int delay) {
-        log.info("gere us tge " + delay);
+    public String getResponse(String nhsNumber, PdsPatchRequest patchRequest, int delay) {
         if (delay > 10000) {
             return serviceUnavailableResponse();
         }
-        return mofUpdatedResponse().replaceAll("NHS_NUMBER", nhsNumber);
+        return mofUpdatedResponse()
+                .replaceAll("NHS_NUMBER", nhsNumber)
+                .replaceAll("UPDATED_MOF", getMofFromPatchRequest(patchRequest));
     }
 
     private String mofUpdatedResponse() {
@@ -136,5 +138,11 @@ public class UpdateResponse {
                 "}";
     }
 
-
+    private String getMofFromPatchRequest(PdsPatchRequest patchRequest) {
+        try {
+            return patchRequest.getPatches().get(0).getValue().getIdentifier().getValue();
+        } catch (Exception e) {
+            return "MOF_UPDATED";
+        }
+    }
 }

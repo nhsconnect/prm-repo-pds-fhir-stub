@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.nhs.prm.repo.pdsfhirstub.delay.DelayResponse;
+import uk.nhs.prm.repo.pdsfhirstub.pdspatchrequest.PdsPatchRequest;
 import uk.nhs.prm.repo.pdsfhirstub.response.RetrievalResponse;
 import uk.nhs.prm.repo.pdsfhirstub.response.UpdateResponse;
 
@@ -29,12 +30,12 @@ public class StubPdsFhirController {
     }
 
     @PatchMapping("Patient/{nhsNumber}")
-    public ResponseEntity<String> updatePatientGpStatus(@PathVariable("nhsNumber") String nhsNumber) throws InterruptedException {
+    public ResponseEntity<String> updatePatientGpStatus(@PathVariable("nhsNumber") String nhsNumber, @RequestBody PdsPatchRequest pdsPatchRequest) throws InterruptedException {
         log.info("Received PDS Update request");
         var requestDelay = delayResponse.getUpdateResponseTime();
 
         log.info("Update Request processed with delay " + requestDelay + "ms");
-        return generateResponse(updateResponse.getResponse(nhsNumber, requestDelay), getUpdateStatus(requestDelay));
+        return generateResponse(updateResponse.getResponse(nhsNumber, pdsPatchRequest, requestDelay), getUpdateStatus(requestDelay));
     }
 
     private ResponseEntity<String> generateResponse(String body, HttpStatus status) {

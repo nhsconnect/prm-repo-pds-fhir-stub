@@ -7,8 +7,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.nhs.prm.repo.pdsfhirstub.delay.DelayResponse;
+import uk.nhs.prm.repo.pdsfhirstub.pdspatchrequest.PdsPatchRequest;
 import uk.nhs.prm.repo.pdsfhirstub.response.RetrievalResponse;
 import uk.nhs.prm.repo.pdsfhirstub.response.UpdateResponse;
 
@@ -54,15 +56,19 @@ public class StubPdsFhirControllerTest {
     @Test
     void shouldDelayResponseAndReturnPdsUpdateResponse() throws Exception {
         var delay = 0;
+        var patchRequest = PdsPatchRequest.builder().build();
         when(delayResponse.getUpdateResponseTime()).thenReturn(delay);
-        when(updateResponse.getResponse(NHS_NUMBER, delay)).thenReturn("update-response");
+        when(updateResponse.getResponse(NHS_NUMBER, patchRequest, delay)).thenReturn("update-response");
 
         var response = mockMvc.perform(
-                patch("/Patient/" + NHS_NUMBER))
+                patch("/Patient/" + NHS_NUMBER)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8")
+                        .content("{}"))
                 .andExpect(status().isOk()).andReturn().getResponse();
 
         verify(delayResponse).getUpdateResponseTime();
-        verify(updateResponse).getResponse(NHS_NUMBER, delay);
+        verify(updateResponse).getResponse(NHS_NUMBER, patchRequest, delay);
         assertThat(response.getContentAsString()).isEqualTo("update-response");
         assertThat(response.getHeaderValue("ETag")).isEqualTo("W/\"1\"");
     }
@@ -70,15 +76,19 @@ public class StubPdsFhirControllerTest {
     @Test
     void shouldReturn503ResponseIfDelayIsOver10Seconds() throws Exception {
         var delay = 10001;
+        var patchRequest = PdsPatchRequest.builder().build();
         when(delayResponse.getUpdateResponseTime()).thenReturn(delay);
-        when(updateResponse.getResponse(NHS_NUMBER, delay)).thenReturn("update-response");
+        when(updateResponse.getResponse(NHS_NUMBER, patchRequest, delay)).thenReturn("update-response");
 
         var response = mockMvc.perform(
-                        patch("/Patient/" + NHS_NUMBER))
+                        patch("/Patient/" + NHS_NUMBER)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8")
+                                .content("{}"))
                 .andExpect(status().isServiceUnavailable()).andReturn().getResponse();
 
         verify(delayResponse).getUpdateResponseTime();
-        verify(updateResponse).getResponse(NHS_NUMBER, delay);
+        verify(updateResponse).getResponse(NHS_NUMBER, patchRequest, delay);
         assertThat(response.getContentAsString()).isEqualTo("update-response");
         assertThat(response.getHeaderValue("ETag")).isEqualTo("W/\"1\"");
     }
