@@ -1,8 +1,8 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.0'
+    id 'org.springframework.boot' version '2.7.6'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
-    id 'org.owasp.dependencycheck' version '6.2.2'
+    id 'org.owasp.dependencycheck' version '7.1.0.1'
 }
 
 group = 'uk.nhs.prm.repo'
@@ -28,18 +28,17 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springdoc:springdoc-openapi-ui:1.6.6'
-    implementation 'net.logstash.logback:logstash-logback-encoder:7.0.1'
+
+    // CVE-2022-1471 false positive as spring boot uses safe constructor in snakeyaml
+    // https://github.com/spring-projects/spring-boot/issues/33457
+    implementation 'org.yaml:snakeyaml:1.33'
+
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    // CVE-2022-25857 fix. We can remove it when springframework.boot and fasterxml libs
-    // (which depend on it) cover this update
-    implementation 'org.yaml:snakeyaml:1.31'
-
-    // CVE-2020-36518...
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.1'
     // including workaround for bom mismatch which should be retired with full jackson-databind release
     components {
         withModule("com.fasterxml.jackson.core:jackson-databind") {
