@@ -50,10 +50,3 @@ resource "aws_acm_certificate_validation" "pds-fhir-stub-cert-validation" {
   certificate_arn = aws_acm_certificate.pds-fhir-stub-cert.arn
   validation_record_fqdns = [for record in aws_route53_record.pds-fhir-stub-cert-validation-record : record.fqdn]
 }
-
-resource "aws_ssm_parameter" "service_url" {
-  name  = "/repo/${var.environment}/output/${var.repo_name}/service-url"
-  type  = "String"
-  value = "https://${var.dns_name}.${var.environment}.non-prod.patient-deductions.nhs.uk"
-  overwrite = true
-}
