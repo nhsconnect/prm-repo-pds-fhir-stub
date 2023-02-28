@@ -55,7 +55,7 @@ common:
 
 pipelines:
   'prm-repo-pds-fhir-stub.perf':
-    group: continuity-service
+    group: performance
     label_template: '${git[:8]}'
     materials:
       git:
